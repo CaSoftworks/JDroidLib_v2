@@ -18,6 +18,8 @@
  */
 package com.casoftworks.jdroidlib.interfaces;
 
+import com.casoftworks.jdroidlib.android.Device;
+
 import java.util.List;
 
 /**
