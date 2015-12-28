@@ -21,6 +21,7 @@ package com.casoftworks.jdroidlib.android;
 import com.casoftworks.jdroidlib.interfaces.ICommand;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * AndroidController class. Extends {@link com.casoftworks.jdroidlib.android.Controller}.
@@ -49,6 +50,8 @@ public final class AndroidController extends Controller {
         return instance == null ? instance = new AndroidController() : instance;
     }
     //</editor-fold>
+    
+    private List<Device> deviceList;
     
     /**
      * Default constructor for this class.
@@ -107,5 +110,13 @@ public final class AndroidController extends Controller {
         
     }
     //</editor-fold>
+    
+    public List<Device> getDevices() {
+        updateDeviceList(); return deviceList;
+    }
+    
+    private void updateDeviceList() {
+        // Execute command
+    }
     
 }

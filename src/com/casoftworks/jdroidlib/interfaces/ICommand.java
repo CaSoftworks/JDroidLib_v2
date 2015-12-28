@@ -19,6 +19,7 @@
 package com.casoftworks.jdroidlib.interfaces;
 
 import com.casoftworks.jdroidlib.android.Device;
+import java.io.IOException;
 
 import java.util.List;
 
@@ -76,8 +77,10 @@ public interface ICommand {
     /**
      * Gets a fully configured instance of a {@link java.lang.ProcessBuilder}
      * @return A ProcessBuilder
+     * @throws IOException This exception is thrown when an error occurs during 
+     * building the process to be executed by JDroidLib.
      */
-    ProcessBuilder buildProcess();
+    ProcessBuilder buildProcess() throws IOException;
     
     /**
      * Sets the device this command should be executed on.

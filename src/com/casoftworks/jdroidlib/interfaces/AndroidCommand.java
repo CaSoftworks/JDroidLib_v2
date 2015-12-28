@@ -19,6 +19,9 @@
 package com.casoftworks.jdroidlib.interfaces;
 
 import com.casoftworks.jdroidlib.android.Device;
+import com.casoftworks.jdroidlib.util.ResourceManager;
+import java.io.IOException;
+import java.util.ArrayList;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,13 +38,15 @@ public abstract class AndroidCommand implements ICommand {
     private ProcessBuilder _builder;
     private Device _device;
     private boolean _runAsRoot;
+    private final boolean _isShellCmd;
     
-    AndroidCommand(String cmd, boolean runAsRoot, Device device, String... args) {
+    AndroidCommand(String cmd, boolean isShellCommand, boolean runAsRoot, Device device, String... args) {
         _command = cmd;
         _args = Arrays.asList(args);
         _builder = new ProcessBuilder();
         _device = device;
         _runAsRoot = runAsRoot;
+        _isShellCmd = isShellCommand;
     }
     
     //<editor-fold defaultstate="collapsed" desc="Implemented methods from ICommand" >
@@ -93,7 +98,21 @@ public abstract class AndroidCommand implements ICommand {
      * {@inheritDoc} 
      */
     @Override
-    public ProcessBuilder buildProcess() { return _builder; }
+    public ProcessBuilder buildProcess() throws IOException { 
+    
+        _builder = new ProcessBuilder();
+        
+        // Build command
+        List<String> command = new ArrayList<>();
+        command.add(_command);
+        _args.forEach((String arg) -> command.add(arg)); 
+        
+        _builder.command(command);
+        _builder.directory(ResourceManager.getInstance().getJDroidLibPath());
+        _builder.redirectErrorStream(true);
+        
+        return _builder; 
+    }
 
     /**
      * {@inheritDoc} 
@@ -115,4 +134,11 @@ public abstract class AndroidCommand implements ICommand {
      * @return {@code true} if this command will run as root.
      */
     public boolean willRunAsRoot() { return _runAsRoot; }
+    
+    /**
+     * Gets a value indicating whether this command will run on the device's 
+     * or not.
+     * @return 
+     */
+    public boolean isShellCommand() { return _isShellCmd; }
 }
