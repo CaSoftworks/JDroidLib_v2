@@ -116,7 +116,7 @@ public final class AndroidController extends Controller {
     }
     
     private void updateDeviceList() {
-        // Execute command
+        AndroidCommand cmd = 
     }
     
 }

@@ -27,7 +27,7 @@ import java.util.List;
  * Command interface for JDroidLib.
  * Provides the basic structure for any command created by and used in JDroidLib.
  * This interface is implemented by 
- * {@link com.casoftworks.jdroidlib.interfaces.AndroidCommand}
+ * {@link com.casoftworks.jdroidlib.android.AndroidCommand}
  * and
  * {@link com.casoftworks.jdroidlib.interfaces.FastbootCommand}
  * @author Simon
