@@ -126,7 +126,19 @@ public final class AndroidCommand implements ICommand {
         command.add(ResourceManager.getInstance().getAdb().getAbsolutePath());
         command.add("-s");
         command.add(_device.getSerial());
-        if (isShellCommand())
+        
+        if (isShellCommand()) {
+            command.add("shell");
+            if (runAsRoot())
+                command.add("su");
+        }
+        
+        command.add(this._command);
+        getArgs().forEach((String arg) -> command.add(arg));
+        
+        _builder.command(command);
+        _builder.directory(ResourceManager.getInstance().getJDroidLibPath());
+        _builder.redirectErrorStream(true);
         
         return _builder; 
     }
@@ -144,13 +156,13 @@ public final class AndroidCommand implements ICommand {
      * executed with root permissions or not.
      * @param val A value indicating whether to execute as root or not.
      */
-    public void setRunAsRoot(boolean val) { this._runAsRoot = val; }
+    public void runAsRoot(boolean val) { this._runAsRoot = val; }
     
     /**
      * Gets a value indicating whether this command will run as root or not.
      * @return {@code true} if this command will run as root.
      */
-    public boolean willRunAsRoot() { return _runAsRoot; }
+    public boolean runAsRoot() { return _runAsRoot; }
     
     /**
      * Gets a value indicating whether this command will run on the device's 
@@ -158,4 +170,12 @@ public final class AndroidCommand implements ICommand {
      * @return 
      */
     public boolean isShellCommand() { return _isShellCmd; }
+    
+    /**
+     * Gets the command (executable) on the device to be called and executed.
+     * @return The command.
+     */
+    public String getCommand() {
+        return this._command;
+    }
 }
