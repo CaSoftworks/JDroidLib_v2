@@ -24,4 +24,28 @@ package com.casoftworks.jdroidlib.android;
  */
 public class Device {
     
+    //<editor-fold defaultstate="collapsed" desc="Properties and shit" >
+    private final String serialNumber;
+    
+    
+    //</editor-fold>
+    
+    /**
+     * Default constructor. Package-private.
+     * @param serialNumber The serial number of the connected device that is
+     *                      to be associated with this instance.
+     */
+    Device(String serialNumber) {
+        this.serialNumber = serialNumber;
+    }
+    
+    /**
+     * Gets the serial number of the device that is associated with this class
+     * instance.
+     * @return The serial number.
+     */
+    public String getSerialNumber() {
+        return serialNumber;
+    }
+    
 }

@@ -18,7 +18,6 @@
  */
 package com.casoftworks.jdroidlib.android;
 
-import com.casoftworks.jdroidlib.android.Device;
 import com.casoftworks.jdroidlib.interfaces.ICommand;
 import com.casoftworks.jdroidlib.util.ResourceManager;
 import java.io.IOException;
@@ -47,15 +46,57 @@ public final class AndroidCommand implements ICommand {
      *                      to execute the command on.
      * @param executable    The executable to be called.
      * @param args          The arguments for the executable.
-     * @param asShell       Run the command on the device's shell.
-     * @param asRoot        Run the command as the root user.
      * @return              An instance of this class.
      */
-    public static AndroidCommand formAndroidCommand(Device device, 
-            String executable, List<String> args, boolean asShell, 
-            boolean asRoot) {
+    public static AndroidCommand formAndroidCommand(Device device, String executable, List<String> args) {
         return new AndroidCommand(
-                executable, asShell, asRoot, device, (String[])args.toArray()
+                executable, false, false, device, (String[])args.toArray()
+        );
+    }
+    
+    /**
+     * Forms a new {@link com.casoftworks.jdroidlib.android.AndroidCommand} which
+     * can be executed with JDroidLib.
+     * @param device The {@link com.casoftworks.jdroidlib.android.Device} on which
+     *                  to execute the command.
+     *                  This can be set to null for a command to run globally or
+     *                  directly within the ADB.
+     * @param executable The executable or command to be called.
+     * @param args The arguments for the executable or command.
+     * @return Returns a new AndroidCommand which can then be executed.
+     */
+    public static AndroidCommand formAndroidCommand(Device device, String executable, String... args) {
+        return new AndroidCommand(executable, false, false, device, args);
+    }
+    
+    /**
+     * Forms a new {@link com.casoftworks.jdroidlib.android.AndroidCommand} which
+     * is run on a given device's shell (calls a command from the device itself).
+     * @param device The device on which to run/perform the command.
+     * @param suPrivilege If {@code true} then the command will be run with super
+     *                      user-rights.
+     * @param executable The executable/command to be called.
+     * @param args The arguments for the executable/command.
+     * @return A new AndroidCommand to be executed.
+     */
+    public static AndroidCommand formAndroidShellCommand(Device device, boolean suPrivilege, String executable, String... args) {
+        return new AndroidCommand(executable, true, suPrivilege, device, args);
+    }
+    
+    /**
+     * Forms a new {@link com.casoftworks.jdroidlib.android.AndroidCommand} which can be executed with JDroidLib.
+     * @param device The device on which to execute the command.
+     * @param suPrivilege If {@code true}, then the executable will be called with super user-rights.
+     * @param executable The executable (command) to be called.
+     * @param args The arguments for the executable (command). 
+     * @return 
+     */
+    public static AndroidCommand formAndroidShellCommand(Device device, boolean suPrivilege, String executable, List<String> args) {
+        return new AndroidCommand(
+                executable,
+                true, suPrivilege,
+                device, 
+                (String[])args.toArray()
         );
     }
     
@@ -124,8 +165,11 @@ public final class AndroidCommand implements ICommand {
         // Build command
         List<String> command = new ArrayList<>();
         command.add(ResourceManager.getInstance().getAdb().getAbsolutePath());
-        command.add("-s");
-        command.add(_device.getSerial());
+        
+        if (_device != null) {
+            command.add("-s");
+            command.add(_device.getSerialNumber());
+        }
         
         if (isShellCommand()) {
             command.add("shell");

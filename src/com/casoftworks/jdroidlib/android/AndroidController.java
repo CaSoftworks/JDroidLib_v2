@@ -19,8 +19,10 @@
 package com.casoftworks.jdroidlib.android;
 
 import com.casoftworks.jdroidlib.interfaces.ICommand;
+import java.io.BufferedReader;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.List;
 
 /**
@@ -111,12 +113,26 @@ public final class AndroidController extends Controller {
     }
     //</editor-fold>
     
-    public List<Device> getDevices() {
+    public List<Device> getDevices() throws IOException {
         updateDeviceList(); return deviceList;
     }
     
-    private void updateDeviceList() {
-        AndroidCommand cmd = 
+    private void updateDeviceList() throws IOException {
+        AndroidCommand cmd = AndroidCommand.formAndroidCommand(null, "devices", "-l");
+        String output = executeCommandReturnOutput(cmd);
+        
+        String line = null;
+        
+        try (BufferedReader reader = new BufferedReader(new StringReader(output))) {
+            while ((line = reader.readLine()) != null) {
+                
+            }
+        } catch (IOException ex) {
+            System.err.println("An error has occurred within JDroidLib!");
+            ex.printStackTrace(System.err);
+            throw ex;
+        }
+        
     }
     
 }
