@@ -23,6 +23,7 @@ import java.io.BufferedReader;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -117,20 +118,36 @@ public final class AndroidController extends Controller {
         updateDeviceList(); return deviceList;
     }
     
-    private void updateDeviceList() throws IOException {
+    void updateDeviceList() throws IOException {
         AndroidCommand cmd = AndroidCommand.formAndroidCommand(null, "devices", "-l");
         String output = executeCommandReturnOutput(cmd);
         
         String line = null;
+        List<Device> deviceList = new ArrayList<>();
         
         try (BufferedReader reader = new BufferedReader(new StringReader(output))) {
             while ((line = reader.readLine()) != null) {
-                
+                if (line.toLowerCase().startsWith("list of") || line.isEmpty()) continue; // Start anew, no device listings (yet).
+                String[] splitValues = line.trim().split("\\s"); // [Serial/IP] [state] [product:value] [model:modelID] [device:[deviceID]
+                boolean deviceFound = false;
+                for (Device device : this.deviceList) {
+                    if (device.getSerialNumber().equals(splitValues[0])) {
+                        device.setDeviceState(DeviceState.valueOf(splitValues[1]));
+                        deviceList.add(device);
+                        deviceFound = true; 
+                        break;
+                    }
+                }
+                if (deviceFound) continue;
+                deviceList.add(new Device(splitValues[0], DeviceState.valueOf(splitValues[1])));
             }
         } catch (IOException ex) {
             System.err.println("An error has occurred within JDroidLib!");
             ex.printStackTrace(System.err);
             throw ex;
+        } finally {
+            if (!deviceList.isEmpty())
+                this.deviceList = deviceList;
         }
         
     }

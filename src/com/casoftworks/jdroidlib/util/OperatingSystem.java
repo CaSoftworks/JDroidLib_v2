@@ -40,6 +40,6 @@ public enum OperatingSystem {
      * @return The path.
      */
     public static String getResourcePackage(OperatingSystem os) {
-        return String.format("/com/casoftworks/jdroidlib/res/%0$s", String.valueOf(os));
+        return String.format("/com/casoftworks/jdroidlib/res/%0$s", String.valueOf(os).toLowerCase());
     }
 }

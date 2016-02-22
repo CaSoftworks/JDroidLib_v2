@@ -18,25 +18,47 @@
  */
 package com.casoftworks.jdroidlib.android;
 
+import java.io.IOException;
+import java.util.List;
+
 /**
  *
  * @author Simon
  */
 public class Device {
     
+    private final AndroidController androidController;
+    
     //<editor-fold defaultstate="collapsed" desc="Properties and shit" >
     private final String serialNumber;
-    
+    private DeviceState deviceState;
     
     //</editor-fold>
     
     /**
      * Default constructor. Package-private.
-     * @param serialNumber The serial number of the connected device that is
+     * @param serialNumber  The serial number of the connected device that is
      *                      to be associated with this instance.
+     * @throws IOException  
      */
-    Device(String serialNumber) {
+    Device(String serialNumber) throws IOException {
         this.serialNumber = serialNumber;
+        this.deviceState = DeviceState.UNKNOWN;
+        androidController = AndroidController.getInstance();
+    }
+    
+    /**
+     * Recommended constructor. Package-private.
+     * @param serialNumber      The serial number of the IP address of the
+     *                          connected device that is to be associated
+     *                          with this object.
+     * @param deviceState       The state the device is currently in.
+     * @throws IOException
+     */
+    Device(String serialNumber, DeviceState deviceState) throws IOException {
+        this.serialNumber = serialNumber;
+        this.deviceState = deviceState;
+        androidController = AndroidController.getInstance();
     }
     
     /**
@@ -46,6 +68,36 @@ public class Device {
      */
     public String getSerialNumber() {
         return serialNumber;
+    }
+    
+    /**
+     * Gets the state the device is currently in.
+     * @return  The {@link com.casoftworks.jdroidlib.android.DeviceState} of this
+     *          object.
+     * @throws IOException 
+     */
+    public DeviceState getDeviceState() throws IOException {
+        androidController.updateDeviceList();
+        return deviceState;
+    }
+    
+    /**
+     * Sets the state of this object (device).
+     * This method is package-private and should never be called by third-party
+     * applications/classes!
+     * @param state The new state of this object (device).
+     */
+    void setDeviceState(DeviceState state) { this.deviceState = state; }
+    
+    /**
+     * Gets a value indicating whether this device has authorized this computer
+     * or not.
+     * If a device has not authorized a computer, said computer CANNOT access it
+     * via ADB!
+     * @return 
+     */
+    public boolean isAuthorized() { 
+        return !deviceState.equals(DeviceState.UNAUTHORIZED); 
     }
     
 }

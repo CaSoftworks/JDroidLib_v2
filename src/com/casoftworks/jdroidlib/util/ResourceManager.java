@@ -186,7 +186,7 @@ public final class ResourceManager {
             
         } else {
             String[] files = {
-                "adb", "fastboot", "dmtracedump", "etc1tool", "hprof-conv"
+                "adb", "fastboot", "dmtracedump", "etc1tool"
             };
             
             for (String file : files) {
