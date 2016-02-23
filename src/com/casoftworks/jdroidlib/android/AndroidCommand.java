@@ -39,6 +39,7 @@ public final class AndroidCommand implements ICommand {
     private Device _device;
     private boolean _runAsRoot;
     private final boolean _isShellCmd;
+    private long timeout = -1;
     
     /**
      * Forms a new AndroidCommand which can be executed with JDroidLib.
@@ -193,6 +194,17 @@ public final class AndroidCommand implements ICommand {
     @Override
     public void setDevice(Device device) { this._device = device; }
     
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setTimeout(long timeout) { this.timeout = timeout; }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getTimeout() { return timeout; }
     //</editor-fold>
     
     /**

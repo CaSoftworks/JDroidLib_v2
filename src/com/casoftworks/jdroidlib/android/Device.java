@@ -75,8 +75,9 @@ public class Device {
      * @return  The {@link com.casoftworks.jdroidlib.android.DeviceState} of this
      *          object.
      * @throws IOException 
+     * @throws java.lang.InterruptedException 
      */
-    public DeviceState getDeviceState() throws IOException {
+    public DeviceState getDeviceState() throws IOException, InterruptedException {
         androidController.updateDeviceList();
         return deviceState;
     }

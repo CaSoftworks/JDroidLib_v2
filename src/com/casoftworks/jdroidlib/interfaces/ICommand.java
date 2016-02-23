@@ -89,4 +89,18 @@ public interface ICommand {
      */
     void setDevice(Device device);
     
+    /**
+     * Sets the timeout for the process in milliseconds.
+     * @param timeout The time (in ms) to wait before terminating the process.
+     * Default is -1.
+     */
+    void setTimeout(long timeout);
+    
+    /**
+     * Gets the timeout for the process in milliseconds.
+     * @return The timeout (in ms) for the process until it is terminated.
+     * Default is -1.
+     */
+    long getTimeout();
+    
 }

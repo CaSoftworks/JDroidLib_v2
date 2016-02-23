@@ -13,7 +13,7 @@
     
     <target name="-pre-jar" >
         <propertyfile file="${src.dir}/com/casoftworks/jdroidlib/version.prop" >
-            <entry key="BUILD" value="0.1" type="double" operation="+" />
+            <entry key="BUILD" value="0.1" type="int" operation="+" />
         </propertyfile>
     </target>
     <!--

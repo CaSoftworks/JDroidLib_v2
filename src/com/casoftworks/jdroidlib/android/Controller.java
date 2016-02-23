@@ -23,6 +23,8 @@ import com.casoftworks.jdroidlib.util.ResourceManager;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
  * Abstract class Controller.
@@ -61,8 +63,9 @@ abstract class Controller {
      * @throws IOException  This exception is thrown, if something goes wrong
      *                      during an IO operation or communication between
      *                      JDroidLib and any given (connected) device.
+     * @throws InterruptedException
      */
-    public abstract String executeCommandReturnOutput(ICommand cmd) throws IOException;
+    public abstract String executeCommandReturnOutput(ICommand cmd) throws IOException, InterruptedException;
     
     /**
      * Executes a given {@link com.casoftworks.jdroidlib.interfaces.ICommand}
@@ -73,8 +76,9 @@ abstract class Controller {
      * @throws IOException  This exception is thrown, if something goes wrong
      *                      during an IO operation or communication between
      *                      JDroidLib and any given (connected) device.
+     * @throws InterruptedException
      */
-    public abstract int executeCommandReturnExitCode(ICommand cmd) throws IOException;
+    public abstract int executeCommandReturnExitCode(ICommand cmd) throws IOException, InterruptedException;
     
     /**
      * Executes a given {@link com.casoftworks.jdroidlib.interfaces.ICommand}
@@ -85,8 +89,9 @@ abstract class Controller {
      * @throws IOException  This exception is thrown, if something goes wrong
      *                      during an IO operation or communication between
      *                      JDroidLib and any given (connected) device.
+     * @throws InterruptedException
      */
-    public abstract void executeCommand(ICommand cmd) throws IOException;
+    public abstract void executeCommand(ICommand cmd) throws IOException, InterruptedException;
     
     /**
      * Executes a given {@link com.casoftworks.jdroidlib.interfaces.ICommand}
@@ -97,8 +102,10 @@ abstract class Controller {
      * @throws IOException  This exception is thrown, if something goes wrong
      *                      during an IO operation or communication between
      *                      JDroidLib and any given (connected) device.
+     * @throws InterruptedException
+     * @throws ExecutionException
      */
-    public abstract String executeCommandReturnOutputAsync(ICommand cmd) throws IOException;
+    public abstract Future<String> executeCommandReturnOutputAsync(ICommand cmd) throws IOException, InterruptedException, ExecutionException;
     
     /**
      * Executes a given {@link com.casoftworks.jdroidlib.interfaces.ICommand}
@@ -109,8 +116,10 @@ abstract class Controller {
      * @throws IOException  This exception is thrown, if something goes wrong
      *                      during an IO operation or communication between
      *                      JDroidLib and any given (connected) device.
+     * @throws InterruptedException
+     * @throws ExecutionException
      */
-    public abstract int executeCommandReturnExitCodeAsync(ICommand cmd) throws IOException;
+    public abstract Future<Integer> executeCommandReturnExitCodeAsync(ICommand cmd) throws IOException, InterruptedException, ExecutionException;
     
     /**
      * Executes a given {@link com.casoftworks.jdroidlib.interfaces.ICommand}
@@ -121,7 +130,9 @@ abstract class Controller {
      * @throws IOException  This exception is thrown, if something goes wrong
      *                      during an IO operation or communication between
      *                      JDroidLib and any given (connected) device.
+     * @throws InterruptedException
+     * @throws ExecutionException
      */
-    public abstract void executeCommandAsync(ICommand cmd) throws IOException;
+    public abstract Future<Void> executeCommandAsync(ICommand cmd) throws IOException, InterruptedException, ExecutionException;
     
 }
