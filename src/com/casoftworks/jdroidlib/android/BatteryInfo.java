@@ -38,6 +38,7 @@ public class BatteryInfo {
         this.device = device;
     }
     
+    
     //<editor-fold defaultstate="collapsed" desc="Battery variables" >
     private boolean acPowered = false;
     private boolean usbPowered = false;
@@ -233,6 +234,201 @@ public class BatteryInfo {
      * @throws InterruptedException 
      */
     public int getAsocNow() throws IOException, InterruptedException { update(); return asocNow; }
+    //</editor-fold>
+    //<editor-fold defaultstate="collapsed" desc="Conversaion Methods and consts" >
+    /**
+     * Converts a given temperature from °C to °F.
+     * @param tempInC The temperature in °C.
+     * @return The temperature in °F.
+     */
+    public double convertTempToFahrenheit(double tempInC) { return tempInC * 1.8 + 32; }
+    
+    //<editor-fold defaultstate="collapsed" desc="Battery health consts" >
+    /**
+     * The battery is cold.
+     */
+    public static final int BATTERY_HEALTH_COLD = 0x00000007;
+    
+    /**
+     * The battery is dead.
+     */
+    public static final int BATTERY_HEALTH_DEAD = 0x00000004;
+    
+    /**
+     * The battery is in good health.
+     */
+    public static final int BATTERY_HEALTH_GOOD = 0x00000002;
+    
+    /**
+     * The battery is overheating! Turn device off immediately!
+     */
+    public static final int BATTERY_HEALTH_OVERHEAT = 0x00000003;
+    
+    /**
+     * The battery is receiving too many volts! Unplug device immediately!
+     */
+    public static final int BATTERY_HEALTH_OVER_VOLTAGE = 0x00000005;
+    
+    /**
+     * The health of the battery is unknown.
+     */
+    public static final int BATTERY_HEALTH_UNKNOWN = 0x00000001;
+    
+    /**
+     * The battery is experiencing an unspecified failure.
+     */
+    public static final int BATTERY_HEALTH_UNSPECIFIED_FAILURE = 0x00000006;
+    
+    /**
+     * Contains objects describing the different states a battery's health can be in.
+     * To convert from native values to an object, use the {@link BatteryHealth#valueOf(int) }
+     */
+    public static enum BatteryHealth {
+        /**
+         * The battery is cold.
+         */
+        BATTERY_HEALTH_COLD,
+        
+        /**
+         * The battery is dead.
+         */
+        BATTERY_HEALTH_DEAD,
+        
+        /**
+         * The battery is in good health.
+         */
+        BATTERY_HEALTH_GOOD,
+        
+        /**
+         * The battery is overheating. Turn off the device ASAP!
+         */
+        BATTERY_HEALTH_OVERHEAT,
+        
+        /**
+         * The battery is receiving too many volts. Unplug the device ASAP!
+         */
+        BATTERY_HEALTH_OVER_VOLTAGE,
+        
+        /**
+         * The battery's health is unknown.
+         */
+        BATTERY_HEALTH_UNKNOWN,
+        
+        /**
+         * The battery is experiencing an unspecified failure.
+         */
+        BATTERY_HEALTH_UNSPECIFIED_FAILURE;
+        
+        /**
+         * Converts a native value to an enum object.
+         * @param nativeValue The native value to be converted.
+         * @return The converted value.
+         */
+        public static BatteryHealth valueOf(int nativeValue) {
+            switch (nativeValue) {
+                case BatteryInfo.BATTERY_HEALTH_COLD:
+                    return BATTERY_HEALTH_COLD;
+                case BatteryInfo.BATTERY_HEALTH_DEAD:
+                    return BATTERY_HEALTH_DEAD;
+                case BatteryInfo.BATTERY_HEALTH_GOOD:
+                    return BATTERY_HEALTH_GOOD;
+                case BatteryInfo.BATTERY_HEALTH_OVERHEAT:
+                    return BATTERY_HEALTH_OVERHEAT;
+                case BatteryInfo.BATTERY_HEALTH_OVER_VOLTAGE:
+                    return BATTERY_HEALTH_OVER_VOLTAGE;
+                case BatteryInfo.BATTERY_HEALTH_UNKNOWN:
+                    return BATTERY_HEALTH_UNKNOWN;
+                case BatteryInfo.BATTERY_HEALTH_UNSPECIFIED_FAILURE:
+                    return BATTERY_HEALTH_UNSPECIFIED_FAILURE;
+                default:
+                    return BATTERY_HEALTH_UNKNOWN;
+            }
+        }
+    }
+    //</editor-fold>
+    
+    //<editor-fold defaultstate="collapsed" desc="Battery stats consts" >
+    /**
+     * The battery is currently charging.
+     */
+    public static final int BATTERY_STATUS_CHARGING = 0x00000002;
+    
+    /**
+     * The battery is currently discharging.
+     */
+    public static final int BATTERY_STATUS_DISCHARGING = 0x00000003;
+    
+    /**
+     * The battery is full.
+     */
+    public static final int BATTERY_STATUS_FULL = 0x00000005;
+    
+    /**
+     * The battery is not charging.
+     */
+    public static final int BATTERY_STATUS_NOT_CHARGING = 0x00000004;
+    
+    /**
+     * The status of the battery is unknown.
+     */
+    public static final int BATTERY_STATUS_UNKNOWN = 0x00000001;
+    
+    /**
+     * An enum containing all of the possible battery statuses.
+     * To convert from a native value to an easier-to-parse value,
+     * use the {@link BatteryStatus#valueOf(int) }
+     */
+    public static enum BatteryStatus {
+        /**
+         * The battery is currently charging.
+         */
+        BATTERY_STATUS_CHARGING,
+        
+        /**
+         * The battery is currently discharging.
+         */
+        BATTERY_STATUS_DISCHARGING,
+        
+        /**
+         * The battery is full.
+         */
+        BATTERY_STATUS_FULL,
+        
+        /**
+         * The battery is not charging.
+         */
+        BATTERY_STATUS_NOT_CHARGING,
+        
+        /**
+         * The status of the battery is unknown.
+         */
+        BATTERY_STATUS_UNKNOWN;
+        
+        /**
+         * Converts a native value to an enum value.
+         * @param nativeValue The native value to be converted.
+         * @return The converted value.
+         */
+        public static BatteryStatus valueOf(int nativeValue) {
+            switch (nativeValue) {
+                case BatteryInfo.BATTERY_STATUS_CHARGING:
+                    return BATTERY_STATUS_CHARGING;
+                case BatteryInfo.BATTERY_STATUS_DISCHARGING:
+                    return BATTERY_STATUS_DISCHARGING;
+                case BatteryInfo.BATTERY_STATUS_FULL:
+                    return BATTERY_STATUS_FULL;
+                case BatteryInfo.BATTERY_STATUS_NOT_CHARGING:
+                    return BATTERY_STATUS_NOT_CHARGING;
+                case BatteryInfo.BATTERY_STATUS_UNKNOWN:
+                    return BATTERY_STATUS_UNKNOWN;
+                default:
+                    return BATTERY_STATUS_UNKNOWN;
+            }
+        }
+    }
+    //</editor-fold>
+    
+    
     //</editor-fold>
     //</editor-fold>
     
