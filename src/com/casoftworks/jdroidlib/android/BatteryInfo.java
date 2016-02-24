@@ -42,7 +42,6 @@ public class BatteryInfo {
         androidController = AndroidController.getInstance();
     }
     
-    
     //<editor-fold defaultstate="collapsed" desc="Battery variables" >
     private boolean acPowered = false;
     private boolean usbPowered = false;

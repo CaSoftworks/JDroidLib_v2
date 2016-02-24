@@ -33,6 +33,7 @@ public class Device {
     private final String serialNumber;
     private DeviceState deviceState;
     
+    private final BatteryInfo battery;
     //</editor-fold>
     
     /**
@@ -41,8 +42,9 @@ public class Device {
      *                      to be associated with this instance.
      * @throws IOException  
      */
-    Device(String serialNumber) throws IOException {
+    Device(String serialNumber) throws IOException, InterruptedException {
         this.serialNumber = serialNumber;
+        battery = new BatteryInfo(this);
         this.deviceState = DeviceState.UNKNOWN;
         androidController = AndroidController.getInstance();
     }
@@ -55,10 +57,9 @@ public class Device {
      * @param deviceState       The state the device is currently in.
      * @throws IOException
      */
-    Device(String serialNumber, DeviceState deviceState) throws IOException {
-        this.serialNumber = serialNumber;
+    Device(String serialNumber, DeviceState deviceState) throws IOException, InterruptedException {
+        this(serialNumber);
         this.deviceState = deviceState;
-        androidController = AndroidController.getInstance();
     }
     
     /**
@@ -100,5 +101,13 @@ public class Device {
     public boolean isAuthorized() { 
         return !deviceState.equals(DeviceState.UNAUTHORIZED); 
     }
+    
+    //<editor-fold defaultstate="collapsed" desc="Device Management" >
+    /**
+     * Gets an instance of {@link BatteryInfo}, which represents the battery of this device.
+     * @return An instance of {@link BatteryInfo}.
+     */
+    public BatteryInfo getBattery() { return battery; }
+    //</editor-fold>
     
 }
