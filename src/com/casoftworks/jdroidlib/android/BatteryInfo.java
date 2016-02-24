@@ -18,7 +18,9 @@
  */
 package com.casoftworks.jdroidlib.android;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.StringReader;
 
 /**
  * Contains information and manipulation methods for a given device's battery.
@@ -29,6 +31,7 @@ import java.io.IOException;
 public class BatteryInfo {
     
     private final Device device;
+    private final AndroidController androidController;
     
     /**
      * Default constructor.
@@ -36,6 +39,7 @@ public class BatteryInfo {
      */
     BatteryInfo(Device device) throws IOException, InterruptedException {
         this.device = device;
+        androidController = AndroidController.getInstance();
     }
     
     
@@ -433,7 +437,64 @@ public class BatteryInfo {
     //</editor-fold>
     
     private void update() throws IOException, InterruptedException {
-        
+        AndroidCommand cmd = AndroidCommand.formAndroidShellCommand(device, false, "dumpsys", "battery");
+        String output = androidController.executeCommandReturnOutput(cmd);
+        try (BufferedReader reader = new BufferedReader(new StringReader(output))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.isEmpty() || line.toLowerCase().startsWith("current battery service")) continue;
+                
+                if (line.trim().toLowerCase().startsWith("ac po")) {
+                    acPowered = Boolean.valueOf(line.split(":")[1]);
+                } if (line.trim().toLowerCase().startsWith("usb po")) {
+                    usbPowered = Boolean.valueOf(line.split(":")[1]);
+                } if (line.trim().toLowerCase().startsWith("wireless")) {
+                    wirelesslyPowered = Boolean.valueOf(line.split(":")[1]);
+                } if (line.trim().toLowerCase().startsWith("status")) {
+                    status = Integer.valueOf(line.split(":")[1]);
+                } if (line.trim().toLowerCase().startsWith("health")) {
+                    health = Integer.valueOf(line.split(":")[1]);
+                } if (line.trim().toLowerCase().startsWith("present")) {
+                    present = Boolean.valueOf(line.split(":")[1]);
+                } if (line.trim().toLowerCase().startsWith("level")) {
+                    level = Integer.valueOf(line.split(":")[1]);
+                } if (line.trim().toLowerCase().startsWith("scale")) {
+                    scale = Integer.valueOf(line.split(":")[1]);
+                } if (line.trim().toLowerCase().startsWith("voltage")) {
+                    voltage = Integer.valueOf(line.split(":")[1]);
+                } if (line.trim().toLowerCase().startsWith("temperature")) {
+                    String split = line.split(":\\s")[1].trim();
+                    char lastChar = split.charAt(split.length() - 1);
+                    String newString = split.substring(0, split.length() - 2).concat(".").concat(String.valueOf(lastChar));
+                    temperature = Double.valueOf(newString);
+                } if (line.trim().toLowerCase().startsWith("technology")) {
+                    technology = line.split(":\\s")[1].trim();
+                } if (line.trim().toLowerCase().startsWith("led charg")) {
+                    ledCharging = Boolean.valueOf(line.split(":")[1]);
+                } if (line.trim().toLowerCase().startsWith("led low")) {
+                    ledLowBattery = Boolean.valueOf(line.split(":")[1]);
+                } if (line.trim().toLowerCase().startsWith("current now")) {
+                    currentNow = Integer.valueOf(line.split(":\\s")[1].trim());
+                } if (line.trim().toLowerCase().startsWith("adaptive")) {
+                    adaptiveFastChargingSettings = Boolean.valueOf(line.split(":")[1]);
+                } if (line.trim().toLowerCase().startsWith("support_log")) {
+                    supportLogBatteryUsage = Boolean.valueOf(line.split(":")[1]);
+                } if (line.trim().toLowerCase().startsWith("istablet")) {
+                    tablet = Boolean.valueOf(line.split(":")[1]);
+                } if (line.trim().toLowerCase().startsWith("mbatterymaxtemp")) {
+                    String split = line.split(":\\s")[1].trim();
+                    char lastChar = split.charAt(split.length() - 1);
+                    String newString = split.substring(0, split.length() - 2).concat(".").concat(String.valueOf(lastChar));
+                    maxTemp = Double.valueOf(newString);
+                } if (line.trim().toLowerCase().startsWith("mbatterymaxcurrent")) {
+                    maxCurrent = Integer.valueOf(line.split(":\\s")[1].trim());
+                } if (line.trim().toLowerCase().startsWith("mbatteryasocefs")) {
+                    asocEfs = Integer.valueOf(line.split(":\\s")[1].trim());
+                } if (line.trim().toLowerCase().startsWith("mbatteryasocnow")) {
+                    asocNow = Integer.valueOf(line.split(":\\s")[1].trim());
+                }
+            }
+        }
     }
     
 }
