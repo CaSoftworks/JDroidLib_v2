@@ -18,7 +18,13 @@
  */
 package com.casoftworks.jdroidlib.android;
 
+import com.casoftworks.jdroidlib.exception.FileListingException;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Represents the filesystem of a given {@link Device}.
@@ -58,7 +64,7 @@ public class FileSystem {
         private boolean _showAllEntries = true;
         private boolean _hideDirectoryJumps = false;
         private boolean _followSymLinks = false;
-        private final boolean _appendSlashToDirs = true;
+        private boolean _appendSlashToDirs = true;
         private boolean _appendIndicatorToEntries = false;
         private boolean _humanReadableSizes = false;
         private boolean _sortInReverseOrder = false;
@@ -152,6 +158,8 @@ public class FileSystem {
          */
         public ListingOptions hideDirectoryJumps(boolean bool) { _hideDirectoryJumps = bool; return this; }
         
+        ListingOptions appendSlashToDirs(boolean bool) { _appendSlashToDirs = bool; return this; }
+        
         /**
          * Sets a value whether to append indicators to entries (one of: * / = @).
          * @param bool The new value.
@@ -195,27 +203,130 @@ public class FileSystem {
         public ListingOptions sortByVersion(boolean bool) { _sortByVersion = bool; return this; }
         //</editor-fold>
         
+        /**
+         * Gets all of the desired options as a {@link List(String)}.
+         * @return A List of String containing all the options.
+         */
+        public List<String> getOptionsAsList() {
+            List<String> ops = new ArrayList<>();
+            
+            if (_showAsList) ops.add("-l");
+            if (_showAllEntries) ops.add("-a");
+            if (_hideDirectoryJumps) ops.add("-A");
+            if (_followSymLinks) ops.add("-L");
+            if (_appendSlashToDirs) ops.add("-p");
+            if (_appendIndicatorToEntries) ops.add("-F");
+            if (_humanReadableSizes) ops.add("-h");
+            if (_sortInReverseOrder) ops.add("-r");
+            if (_sortBySize) ops.add("-S");
+            if (_sortByExtension) ops.add("-X");
+            if (_sortByVersion) ops.add("-v");
+            
+            return ops;
+        }
+        
+        /**
+         * Gets the desired options as a String[].
+         * @return A String array containing all of the needed/wanted options.
+         */
+        public String[] getOptionsAsArray() {
+            String[] array = new String[12];
+            return getOptionsAsList().toArray(array);
+        }
+        
+        /**
+         * Gets all of the desired options as a {@link List(String) }, including the path at the end of the list.
+         * @param path The path which to include in the options.
+         * @return A list containing all of the desired options including the path.
+         */
+        public List<String> getOptionsAsListIncludePath(String path) {
+            List<String> ops = getOptionsAsList();
+            ops.add(path);
+            return ops;
+        }
+        
+        /**
+         * Gets a String[] containing all of the desired options, including the path.
+         * @param path The path which to include to the options.
+         * @return An array of Strings containing the desires options and the path.
+         */
+        public String[] getOptionsAsArrayIncludePath(String path) {
+            String[] ops = new String[12];
+            return getOptionsAsListIncludePath(path).toArray(ops);
+        }
+        
     }
     //</editor-fold>
     
     private final Device device;
+    private final AndroidController androidController;
     
     /**
      * Default constructor.
      * @param device 
      */
-    FileSystem(Device device) {
+    FileSystem(Device device) throws IOException, InterruptedException {
         this.device = device;
+        androidController = AndroidController.getInstance();
     }
     
     /**
      * Lists all the files in a given directory.
      * @param path The path from which to list the files.
+     * @param requireSuperUser Set to {@code true}, if super user privileges are required to scan a directory.
      * @param options The options for the file/directory listing. Set to {@code null} to use the default options!
      * @return A {@link HashMap(String, ListingType)} containing all of the filesystem entries.
+     * @throws java.io.IOException
+     * @throws java.lang.InterruptedException
      */
-    public HashMap<String, ListingType> listFiles(String path, ListingOptions options) {
+    public HashMap<String, ListingType> listFiles(String path, boolean requireSuperUser, ListingOptions options) throws IOException, InterruptedException, FileListingException {
         HashMap<String, ListingType> entries = new HashMap<>();
+        
+        // Don't even think of using BusyBox in this method. Create a separate method for it.
+        // Set listing options
+        if (options == null)
+            options = new ListingOptions()
+                    .appendIndicatorToEntries(false)
+                    .appendSlashToDirs(false)
+                    .hideDirectoryJumps(true)
+                    .showAllEntries(false)
+                    .showHumanReadableSizes(false)
+                    .sortByExtension(false)
+                    .sortBySize(false)
+                    .sortByVersion(false)
+                    .sortInReverseOrder(false);
+        
+        AndroidCommand cmd = AndroidCommand.formAndroidShellCommand(device, requireSuperUser , "ls", options.getOptionsAsListIncludePath(path));
+        String output = androidController.executeCommandReturnOutput(cmd);
+        if (output.toLowerCase().contains("aborting.") || output.toLowerCase().contains("permission denied."))
+            throw new FileListingException(output.replace("ls:", ""));
+        
+        try (BufferedReader reader = new BufferedReader(new StringReader(output))) {
+            String line;
+            
+            while ((line = reader.readLine()) != null) {
+                String[] split = line.split("\\s");
+                // Split string by whitespace. If the length of the array is 6, the entry is a directory.
+                // If the length of the array is 7, the entry is a file.
+                // File listings include the size of the file. With directories, this is left out as whitespace.
+                
+                if (split.length == 6) {
+                    // Entry is a directory - missing file size
+                    
+                    // TODO: Add logic.
+                } else {
+                    // Entry is a file - file size is present.
+                    
+                    // TODO: Add logic
+                }
+                
+            }
+            
+        } catch (IOException ex) {
+            System.err.println("An error has occurred within JDroidLib");
+            ex.printStackTrace(System.err);
+            throw ex;
+        }
         
         return entries;
     }
