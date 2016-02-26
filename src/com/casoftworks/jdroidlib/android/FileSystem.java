@@ -278,6 +278,7 @@ public class FileSystem {
      * @return A {@link HashMap(String, ListingType)} containing all of the filesystem entries.
      * @throws java.io.IOException
      * @throws java.lang.InterruptedException
+     * @throws com.casoftworks.jdroidlib.exception.FileListingException
      */
     public HashMap<String, ListingType> listFiles(String path, boolean requireSuperUser, ListingOptions options) throws IOException, InterruptedException, FileListingException {
         HashMap<String, ListingType> entries = new HashMap<>();
@@ -310,15 +311,12 @@ public class FileSystem {
                 // If the length of the array is 7, the entry is a file.
                 // File listings include the size of the file. With directories, this is left out as whitespace.
                 
-                if (split.length == 6) {
+                if (split.length == 6)
                     // Entry is a directory - missing file size
-                    
-                    // TODO: Add logic.
-                } else {
+                    entries.put(split[split.length - 1], ListingType.DIRECTORY);
+                else
                     // Entry is a file - file size is present.
-                    
-                    // TODO: Add logic
-                }
+                    entries.put(split[split.length - 1], ListingType.FILE);
                 
             }
             
@@ -327,6 +325,32 @@ public class FileSystem {
             ex.printStackTrace(System.err);
             throw ex;
         }
+        
+        return entries;
+    }
+    
+    /**
+     * Lists all of the filesystem entries in a given directory.
+     * This function uses busybox! If busybox is not installed on the system, this method WILL throw an exception if the busybox binary could not be found!
+     * @param path The path of which to list the entries.
+     * @param requireSuperUser Set to {@code true} if super user privileges are required to peek in to the provided path.
+     * @param options The options to use for entry listing. Set to {@code null} to use the default options.
+     * @return This function returns a {@link HashMap(String, ListingType)} where the string is the name of the filesystem entry, 
+     * and the {@link ListingType} describes whether the entry is a directory or a file.
+     * @throws IOException
+     * @throws InterruptedException
+     * @throws FileListingException 
+     */
+    public HashMap<String, ListingType> listFilesUsingBusybox(String path, boolean requireSuperUser, ListingOptions options) throws IOException, InterruptedException, FileListingException {
+        HashMap<String, ListingType> entries = new HashMap<>();
+        
+        if (options == null)
+            options = new ListingOptions();
+        
+        List<String> ops = new ArrayList<>();
+        ops.add("ls");
+        ops.addAll(options.getOptionsAsListIncludePath(path));
+        AndroidCommand cmd = AndroidCommand.formAndroidShellCommand(device, requireSuperUser, "busybox", ops);
         
         return entries;
     }
